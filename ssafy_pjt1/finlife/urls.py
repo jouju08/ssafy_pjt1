@@ -1,0 +1,13 @@
+from django.contrib import admin
+from django.urls import path, include
+from . import views
+app_name='back'
+
+urlpatterns = [
+    path('save-deposit-products/', views.save_deposit_product),
+    path('deposit-products/', views.deposit_product),
+    path('deposit-products-options/<str:fin_prdt_cd>/', views.deposit_product_options),
+    path('deposit-products/top_rate/', views.top_rate),
+    path('change/', views.save_change),
+    path('change/<str:cur_unit>/', views.get_change),
+]

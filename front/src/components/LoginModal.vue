@@ -6,11 +6,11 @@
           <h3 class="modal-title">Login</h3>
           <form @submit.prevent="logIn">
             <div class="user-box">
-              <input type="text" required v-model="username" />
+              <input type="text" id="username" required v-model.trim="username" />
               <label>Username</label>
             </div>
             <div class="user-box">
-              <input type="password" required v-model="password" />
+              <input type="password" id="password" required v-model.trim="password" />
               <label>Password</label>
             </div>
             <div class="button-group">
@@ -26,52 +26,67 @@
 
 <script setup>
 import { ref } from "vue";
-import axios from "axios"; // Axios 임포트
-import { useRouter } from "vue-router"; // 라우터 임포트
+import { useRouter } from "vue-router";
+import { useAuthStore } from '@/stores/authStore'
 
 const isVisible = ref(false);
 const username = ref('');
 const password = ref('');
-const router = useRouter(); // 라우터 사용
+const router = useRouter();
+const store = useAuthStore();  // Pinia store 초기화
 
+// 모달 열기 함수
 const openModal = () => {
   isVisible.value = true;
 };
 
+// 모달 닫기 함수
 const closeModal = () => {
   isVisible.value = false;
 };
 
+// 로그인 처리 함수
 const logIn = async () => {
-  try {
-    // 로그인 요청 보내기
-    const response = await axios.post("/api/login", {
-      username: username.value,
-      password: password.value
-    });
+  const payload = {
+    username: username.value,
+    password: password.value
+  };
 
-    if (response.data.success) {
-      // 로그인 성공 시 모달 닫기
-      closeModal();
-      alert("로그인 성공!");
+  try {
+    // 로그인 요청
+    await store.logIn(payload);
+
+    // 로그인 성공 후 모달 닫기
+    closeModal();
+
+    // 현재 페이지가 회원가입 페이지이면 메인 페이지로 이동
+    if (router.currentRoute.value.path === '/signup') {
+      router.push("/"); // 메인 페이지로 이동
     } else {
-      alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+      // 회원가입 페이지가 아니면 모달만 닫기
+      router.go(0); // 페이지 새로 고침
     }
+
+    alert("로그인 성공!");
+
   } catch (error) {
     console.error("로그인 에러:", error);
-    alert("로그인 중 오류가 발생했습니다.");
+    alert("아이디 또는 비밀번호가 일치하지 않습니다.");
   }
 };
 
+// 회원가입 페이지로 이동
 const goToSignUp = () => {
   closeModal();
-  router.push("/signup"); // 회원가입 페이지로 이동
+  router.push("/signup");
 };
 
+// Pinia store에서 모달 제어를 위해 expose
 defineExpose({
   openModal,
 });
 </script>
+
 
 <style scoped>
 /* 모달 오버레이 */

@@ -163,3 +163,9 @@ def get_change(request,cur_unit):
     serializer=ChangeSerializer(changes, many=True)
     return Response(serializer.data)
     
+@api_view(['GET'])
+def get_bankname(request):
+    products = DepositProducts.objects.values('kor_co_nm').distinct().order_by('kor_co_nm')
+    bank_names = [product['kor_co_nm'] for product in products]
+    
+    return Response(bank_names)

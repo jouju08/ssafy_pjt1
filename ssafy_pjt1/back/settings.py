@@ -107,9 +107,9 @@ ROOT_URLCONF = 'back.urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mysql_db',
-        'USER': 'juha0824',
-        'PASSWORD': 'juha',
+        'NAME': 'pjt10',
+        'USER': 'root',
+        'PASSWORD': '0000',
         'HOST': 'localhost',   # MySQL 호스트
         'PORT': '3306',        # MySQL 포트 (기본값은 3306)
         'OPTIONS': {
@@ -162,3 +162,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_AUTH = {
+ 'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+ 'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
+}
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'

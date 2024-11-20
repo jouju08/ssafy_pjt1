@@ -15,7 +15,7 @@
       <!-- 비밀번호 -->
       <div class="form-group">
         <label for="password1">비밀번호</label>
-        <input type="password" id="password1" v-model.trim="password1" class="form-control" placeholder="8~16자리/영문 대소문자, 숫자, 특수문자 조합" required>
+        <input type="password" id="password1" v-model.trim="password1" class="form-control" placeholder="8~16자리/영문 대소문자, 숫자, 특수문자 조합" @input="checkPassword" required>
         <span v-if="password1 && password1Checked" :class="password1Valid ? 'valid-check' : 'invalid-check'">{{ password1Valid ? '✔' : '✖' }}</span>
         <p class="helper-text">8~16자리 영문 대소문자, 숫자, 특수문자 중 3가지 이상 조합으로 만들어주세요.</p>
       </div>
@@ -42,14 +42,14 @@
       <!-- 생년월일 -->
       <div class="form-group">
         <label for="birth">생년월일</label>
-        <input type="date" id="birth" v-model="birth" class="form-control" required>
+        <input type="date" id="birth" v-model.trim="birth" class="form-control" required>
       </div>
 
       <!-- 휴대폰 -->
       <div class="form-group">
         <label for="phone">휴대폰</label>
         <div class="input-group">
-          <input type="text" id="phone" v-model.trim="phone" class="form-control" placeholder="'-' 빼고 숫자만 입력" required>
+          <input type="text" id="phone" v-model.trim="phone" class="form-control" placeholder="'-' 빼고 숫자만 입력" @input="checkPhone" required>
         </div>
         <span v-if="phone && phoneChecked" :class="phoneValid ? 'valid-check' : 'invalid-check'">{{ phoneValid ? '✔' : '✖' }}</span>
       </div>
@@ -89,10 +89,7 @@
       </div>
 
       <!-- 잔고 -->
-      <div class="form-group">
-        <label for="balance">보유 잔고(원)</label>
-        <input type="number" id="balance" v-model="balance" class="form-control" placeholder="보유 잔고 입력" required>
-      </div>
+      <!-- <div class="form-x` -->
 
       <!-- 약관 동의 -->
       <div class="form-group terms-box">
@@ -131,12 +128,12 @@ const password1 = ref('');
 const password2 = ref('');
 const first_name = ref('');
 const last_name = ref('');
-const birth = ref('');
+const birth = ref(null);
 const phone = ref('');
 const email = ref('');
 const mainBank = ref('');
 const income = ref('');
-const balance = ref('');
+// const balance = ref('');
 const agree1 = ref(false);
 const agree2 = ref(false);
 const checkAll = ref(false);
@@ -157,16 +154,18 @@ const canSubmit = ref(false);
 // 아이디 유효성 검사
 const checkUsername = () => {
   usernameValid.value = /^[a-zA-Z0-9!]{4,20}$/.test(username.value);
+  console.log('Username Valid:', usernameValid.value); // 로그 추가
   usernameChecked.value = false;  // 아이디를 입력할 때마다 중복확인 여부 초기화
   checkFormValidity();
 };
+
+// 아이디 중복 확인
 axios.defaults.baseURL = 'http://localhost:8000/api/accounts';  // Django 서버의 API URL
 
 const checkUsernameAvailability = async () => {
   console.log("username.value:", username.value);
   if (usernameValid.value) {
     try {
-      // URL이 간단해졌습니다.
       const response = await axios.get(`/check-username?username=${username.value}`);
       if (response.data.isAvailable) {
         usernameChecked.value = true;
@@ -183,10 +182,10 @@ const checkUsernameAvailability = async () => {
   checkFormValidity();
 };
 
-
 // 비밀번호 유효성 검사
 const checkPassword = () => {
   password1Valid.value = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/.test(password1.value);
+  console.log('Password1 Valid:', password1Valid.value); // 로그 추가
   checkFormValidity();
 };
 
@@ -194,43 +193,49 @@ const checkPassword = () => {
 const checkPasswordMatch = () => {
   isPasswordMatch.value = password1.value === password2.value;
   password2Valid.value = isPasswordMatch.value;
+  console.log('Password Match:', isPasswordMatch.value); // 로그 추가
   checkFormValidity();
 };
 
-// 전화번호 유효성 검사
+// 휴대폰 유효성 검사
 const checkPhone = () => {
+  console.log(phone.value);
   phoneValid.value = /^\d{10,11}$/.test(phone.value);
+  console.log('Phone Valid:', phoneValid.value); // 로그 추가
   checkFormValidity();
 };
 
 // 약관 동의 체크
 const checkAgreement = () => {
+  console.log('Agree1:', agree1.value);
+  console.log('Agree2:', agree2.value);
   checkFormValidity();
 };
 
-// 전체 동의 처리
+// 전체 약관 동의 처리
 const toggleAll = () => {
   agree1.value = checkAll.value;
   agree2.value = checkAll.value;
   checkAgreement();
 };
 
-// 폼 유효성 체크
+// 폼 유효성 확인
 const checkFormValidity = () => {
   canSubmit.value =
-    usernameValid.value &&
-    usernameChecked.value &&
+    usernameValid.value && 
+    usernameChecked.value && 
     password1Valid.value &&
     password2Valid.value &&
     phoneValid.value &&
     agree1.value &&
-    agree2.value;
+    agree2.value &&
+    birth.value !== '';
 };
 
 // 회원가입 처리
 const signUp = async () => {
   try {
-    const response = await axios.post('/api/signup', {
+    const response = await axios.post('http://localhost:8000/accounts/signup/', {
       username: username.value,
       password1: password1.value,
       password2: password2.value,
@@ -241,7 +246,7 @@ const signUp = async () => {
       email: email.value,
       mainBank: mainBank.value,
       income: income.value,
-      balance: balance.value,
+      // balance: balance.value,
     });
     console.log('회원가입 성공', response);
   } catch (error) {

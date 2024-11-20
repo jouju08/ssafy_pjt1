@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
-app_name='back'
+app_name='finlife'
 
 urlpatterns = [
     path('save-deposit-products/', views.save_deposit_product),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('deposit-products/top_rate/', views.top_rate),
     path('change/', views.save_change),
     path('change/<str:cur_unit>/', views.get_change),
+    path('getBankName/', views.get_bankname)
 ]

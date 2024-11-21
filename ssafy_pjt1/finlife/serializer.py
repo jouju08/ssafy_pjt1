@@ -6,17 +6,24 @@ class DepositProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model=DepositProducts
         fields='__all__'
-    # class OptionListSerializer(serializers.ModelSerializer):
-    #     class Meta:
-    #         model=DepositOptions
-    #         fields='__all__'
-    # options=OptionListSerializer(many=True, read_only=True)
+    class OptionListSerializer(serializers.ModelSerializer):
+        class Meta:
+            model=DepositOptions
+            fields='__all__'
+    options=OptionListSerializer(many=True, read_only=True)
+    
 
 class DepositOptionsSerializer(serializers.ModelSerializer):
+    # class ProductSerializer(serializers.ModelSerializer):
+    #     class Meta:
+    #         model=DepositProducts
+    #         fields='__all__'
+    # product=ProductSerializer(read_only=True)
     class Meta:
         model=DepositOptions
         fields='__all__'
-        read_only_fields=('product',)
+        # fields=('product', 'intr_rate_type_nm',"intr_rate","intr_rate2", "save_trm",)
+       
 
 class ChangeSerializer(serializers.ModelSerializer):
     class Meta:

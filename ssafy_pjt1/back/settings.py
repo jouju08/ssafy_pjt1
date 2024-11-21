@@ -107,9 +107,9 @@ ROOT_URLCONF = 'back.urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pjt10',
-        'USER': 'root',
-        'PASSWORD': '0000',
+        'NAME': 'mysql_db',
+        'USER': 'juha0824',
+        'PASSWORD': 'juha',
         'HOST': 'localhost',   # MySQL 호스트
         'PORT': '3306',        # MySQL 포트 (기본값은 3306)
         'OPTIONS': {

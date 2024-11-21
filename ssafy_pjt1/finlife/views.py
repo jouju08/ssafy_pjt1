@@ -97,8 +97,8 @@ def deposit_product(request):
 #특정 상품의 옵션 리스트 반환
 @api_view(['GET'])
 def deposit_product_options(request,fin_prdt_cd):
-    option_list=get_list_or_404(DepositOptions,fin_prdt_cd=fin_prdt_cd)
-    serializer=DepositOptionsSerializer(option_list, many=True)
+    option_list=DepositProducts.objects.filter(fin_prdt_cd=fin_prdt_cd)
+    serializer=DepositProductsSerializer(option_list, many=True)
     return Response(serializer.data)
 
 
@@ -130,12 +130,12 @@ def save_change(request):
     today=datetime.now()
     if today.weekday()>=5:
         diff = today.weekday()-4
-        today = today - datetime.timedelta(days=diff)	
+        today = today - datetime.timedelta(days=diff)#주말엔 정보가 없으니 금요일로 바꿔주기
     today=today.strftime('%Y%m%d')
     API_KEYY='CVkBJTzbrnQkcYoUhhxeKEJughCIro3U'
     URL2='https://www.koreaexim.go.kr/site/program/financial/exchangeJSON?authkey={}&searchdate={}&data=AP01'
     url=URL2.format(API_KEYY, today)
-    response=requests.get(url,verify=True).json()
+    response=requests.get(url,verify=False).json()#오류나면 verify 값 바꿔주기
     print(response)
     for li in response:
         cur_unit=li.get('cur_unit')

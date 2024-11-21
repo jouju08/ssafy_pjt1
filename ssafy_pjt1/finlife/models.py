@@ -11,7 +11,7 @@ class DepositProducts(models.Model):
     spcl_cnd=models.TextField()#우대 조건
 
 class DepositOptions(models.Model):
-    product=models.ForeignKey(DepositProducts,on_delete=models.CASCADE)
+    product=models.ForeignKey(DepositProducts,related_name='options',on_delete=models.CASCADE)
     fin_prdt_cd=models.CharField(max_length=50)# 금융 상품 코드
     intr_rate_type_nm=models.CharField(max_length=100) #저축금리 유형명
     intr_rate=models.FloatField() #저축금리3

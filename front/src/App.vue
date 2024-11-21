@@ -8,6 +8,9 @@
 
     <!-- 로그인 모달 컴포넌트 추가 -->
     <LoginModal ref="loginModal" />
+    <nav>
+      <RouterLink :to="{name: 'ArticleView'}">Articles</RouterLink>
+    </nav>
   </div>
 </template>
 
@@ -15,6 +18,8 @@
 import Navbar from "@/components/Navbar.vue";
 import LoginModal from "@/components/LoginModal.vue"; // 로그인 모달 컴포넌트
 import { ref } from 'vue';
+import { RouterLink } from "vue-router";
+import ArticleView from "./views/ArticleView.vue";
 
 // 로그인 모달 컴포넌트 참조
 const loginModal = ref(null);

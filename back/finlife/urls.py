@@ -10,5 +10,8 @@ urlpatterns = [
     path('deposit-products/top_rate/', views.top_rate),
     path('change/', views.save_change),
     path('change/<str:cur_unit>/', views.get_change),
-    path('getBankName/', views.get_bankname)
+    path('getBankName/', views.get_bankname),
+    path('<str:fin_prdt_cd>/top_rate_month/', views.top_rate_month),
+   
+   
 ]

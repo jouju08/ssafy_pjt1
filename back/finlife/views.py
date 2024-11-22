@@ -55,6 +55,7 @@ def save_deposit_product(request):
     
 
     for li in response.get('result').get('optionList'):
+        
         fin_prdt_cd=li.get('fin_prdt_cd')
         intr_rate_type_nm=li.get('intr_rate_type_nm')
         intr_rate=li.get('intr_rate') or -1
@@ -70,6 +71,7 @@ def save_deposit_product(request):
             continue
         
         save_data={
+            'product': product.id,
             'fin_prdt_cd':fin_prdt_cd,
             'intr_rate_type_nm':intr_rate_type_nm,
             'intr_rate':intr_rate,
@@ -169,3 +171,29 @@ def get_bankname(request):
     bank_names = [product['kor_co_nm'] for product in products]
     
     return Response(bank_names)
+
+@api_view(['GET'])
+def top_rate_month(request,fin_prdt_cd):
+    product=DepositProducts.objects.get(fin_prdt_cd=fin_prdt_cd)
+    options = product.options.all() 
+    max_Mrate=0
+    max_rate=0
+    min_rate=1000
+    max_month=0
+    min_month=21e8
+    for option in options:
+        max_Mrate = max(max_Mrate, option.intr_rate2)
+        max_rate = max(max_rate, option.intr_rate)
+        max_rate = max(max_rate, option.intr_rate2)
+        min_rate = min(min_rate, option.intr_rate)
+        max_month = max(max_month, option.save_trm)
+        min_month = min(min_month, option.save_trm)
+    data={
+        'max_Mrate':max_Mrate,#우대금리(최고)
+        'max_rate':max_rate,#기본금리 max
+        'min_rate':min_rate,#기본금리 min
+        'max_month':max_month,
+        'min_month':min_month,
+    }     
+    return Response(data=data)
+

@@ -39,11 +39,19 @@
               <div class="space-y-2">
                 <div>
                   <span class="text-sm text-gray-500">기본금리</span>
-                  <p class="text-lg font-bold">{{ product.basicRate }}%</p>
+                  <div v-if="product.maxRate===0">
+                    <p class="text-lg font-bold">{{ product.minRate }}%</p>
+                  </div>
+                  <div v-else-if="options.minRate===1000">
+                    <p class="text-lg font-bold">{{ product.maxRate }}%</p>
+                  </div>
+                  <div v-else>
+                    <p class="text-lg font-bold">{{ product.minRate }}% ~ {{ product.maxRate }}%</p>
+                  </div>
                 </div>
                 <div>
                   <span class="text-sm text-gray-500">최고금리</span>
-                  <p class="text-lg font-bold text-[#699BF7]">{{ product.maxRate }}%</p>
+                  <p class="text-lg font-bold text-[#699BF7]">{{ product.maxMRate }}%</p>
                 </div>
               </div>
             </div>
@@ -51,29 +59,10 @@
         </div>
 
         <!-- 우대금리 옵션 -->
-        <div v-if="options.length > 0">
+        <div v-if="spclCnd!=''">
           <h4 class="font-medium text-gray-600 mb-3">우대금리 조건</h4>
-          <div class="space-y-3">
-            <div 
-              v-for="option in options" 
-              :key="option.id"
-              class="bg-gray-50 p-4 rounded"
-            >
-              <div class="flex justify-between items-start">
-                <div class="flex-1">
-                  <p class="font-medium">{{ option.intr_rate_type_nm }}</p>
-                  <p class="text-sm text-gray-500 mt-1">
-                    가입기간: {{ option.save_trm }}개월
-                  </p>
-                </div>
-                <div class="ml-4 text-right">
-                  <span class="text-sm text-gray-500">우대금리</span>
-                  <p class="font-bold text-[#699BF7]">
-                    {{ option.intr_rate2 }}%
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div class="bg-gray-50 p-4 rounded">
+            <p class="text-sm text-gray-600 whitespace-pre-line">{{ product.spclCnd }}</p>
           </div>
         </div>
 
@@ -115,7 +104,8 @@ const props = defineProps({
 
 onMounted(async () => {
   try {
-    const data = await store.fetchProductOptions(props.product.id)
+    const data = await store.findRates(props.product.id)
+    console.log(data)
     options.value = data
   } catch (error) {
     console.error('Error fetching product options:', error)

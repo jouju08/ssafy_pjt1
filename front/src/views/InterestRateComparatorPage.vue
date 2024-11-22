@@ -73,10 +73,10 @@
               <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">{{ product.bankName }}</td>
                 <td class="px-6 py-4">{{ product.productName }}</td>
-                <td class="px-6 py-4 whitespace-nowrap">{{ product.period }}개월</td>
-                <td class="px-6 py-4 whitespace-nowrap">{{ product.basicRate }}%</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ product.minMonth }}~{{ product.maxMonth }}개월</td>
+                <td class="px-6 py-4 whitespace-nowrap">{{ product.minRate }}%~</td>
                 <td class="px-6 py-4 whitespace-nowrap font-semibold text-[#699BF7]">
-                  {{ product.maxRate }}%
+                  {{ product.maxMRate }}%
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button 
@@ -114,7 +114,7 @@ const chartInstance = ref(null)
 
 const filters = ref({
   bankCode: '',
-  period: ''
+  period:null
 })
 
 const periods = [6, 12, 24, 36]
@@ -147,7 +147,7 @@ const updateChart = () => {
       datasets: [
         {
           label: '기본금리',
-          data: displayProducts.map(p => p.basicRate),
+          data: displayProducts.map(p => p.minRate),
           backgroundColor: '#699BF7'
         },
         {

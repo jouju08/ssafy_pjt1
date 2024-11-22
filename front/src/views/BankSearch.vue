@@ -47,15 +47,15 @@
               <div class="flex justify-between items-start mb-2">
                 <div>
                   <h4 class="font-semibold">{{ product.productName }}</h4>
-                  <p class="text-sm text-gray-500">{{ product.period }}개월</p>
+                  <p class="text-sm text-gray-500">{{ product.minMonth }}~{{ product.maxMonth }}개월</p>
                 </div>
                 <div class="text-right">
                   <p class="text-sm text-gray-600">최고금리</p>
-                  <p class="text-lg font-bold text-[#699BF7]">{{ product.maxRate }}%</p>
+                  <p class="text-lg font-bold text-[#699BF7]">{{ product.maxMRate }}%</p>
                 </div>
               </div>
               <div class="flex justify-between text-sm text-gray-600">
-                <span>기본금리: {{ product.basicRate }}%</span>
+                <span>기본금리: {{ product.minRate }}%~{{ product.maxRate }}%</span>
                 <button 
                   @click="showDetails(product)"
                   class="text-[#699BF7] hover:underline"
@@ -107,7 +107,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useFinanceStore } from '../stores/finance'
 import ProductDetailsModal from '../components/ProductDetailsModal.vue'
-
+const options = ref([])
 const store = useFinanceStore()
 const map = ref(null)
 const ps = ref(null)
@@ -120,6 +120,7 @@ const loading = ref(false)
 
 const bankProducts = computed(() => {
   if (!selectedBank.value) return []
+  
   return store.products.filter(product => 
     product.bankName === selectedBank.value
   ).sort((a, b) => b.maxRate - a.maxRate)
@@ -157,6 +158,7 @@ const searchPlaces = () => {
       )
       
       if (filteredData.length > 0) {
+      
         displayPlaces(filteredData)
         displayPagination(pagination)
       } else {
@@ -193,6 +195,7 @@ const displayPlaces = (places) => {
     itemEl.onclick = () => {
       map.value.setCenter(placePosition)
       displayInfowindow(marker, place)
+      
     }
 
     listEl.appendChild(itemEl)
@@ -287,6 +290,8 @@ onMounted(async () => {
     console.error('Error:', error)
   }
 })
+
+
 </script>
 
 <style scoped>

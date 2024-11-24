@@ -22,6 +22,7 @@ urlpatterns = [
     path('article/',include('article.urls')),
     path('accounts/signup/',include('dj_rest_auth.registration.urls')),
     path('accounts/',include('dj_rest_auth.urls')),
+    path('account/',include('accounts.urls')),
     path('finlife/', include('finlife.urls')),
-    path('api/accounts/', include('accounts.urls')),
+    path('chatbot/',include('chatbot.urls')),
 ]

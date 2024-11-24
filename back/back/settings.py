@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'finlife',
     'accounts',
     'article',
+    'chatbot',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -168,4 +169,14 @@ REST_AUTH = {
  'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
 }
 
+
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+CHATBOT_API_KEY='  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'
+
+#비밀번호 찾기 용
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT='587'
+EMAIL_HOST_USER='juha0824@gmail.com'
+EMAIL_HOST_PASSWORD='xwae grfc qkaa gqqr'
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=EMAIL_HOST_USER

@@ -4,8 +4,10 @@ from rest_framework.authtoken.models import Token
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.http import JsonResponse
+from .models import User
+from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-
+from rest_framework.decorators import api_view, permission_classes
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
@@ -26,3 +28,20 @@ def check_username(request):
         # 예외가 발생하면 로깅하고 500 에러를 반환
         print(f"Error in check_username view: {str(e)}")
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+@api_view(['POST'])
+def find_id(request):
+    data='이메일을 다시 확인하세요'
+    response={
+                'User_Id':data
+            }
+    email=request.POST.get('email')
+    
+    try:
+        user=User.objects.get(email=email)
+        if user is not None:
+            response['User_Id']=user.username
+            
+            return Response(response)
+    except:
+        return Response(response)

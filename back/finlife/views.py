@@ -7,6 +7,7 @@ from .models import DepositProducts, DepositOptions,Change
 from .serializer import DepositOptionsSerializer, DepositProductsSerializer,ChangeSerializer
 from django.http import JsonResponse
 from django.conf import settings
+from urllib.parse import quote, urlencode
 API_KEY='8606577955382312a042df530b801d13'
 BASE_URL='http://finlife.fss.or.kr/finlifeapi/'
 from datetime import datetime
@@ -197,3 +198,29 @@ def top_rate_month(request,fin_prdt_cd):
     }     
     return Response(data=data)
 
+@api_view(['GET'])
+def get_news(request):
+    URL='https://openapi.naver.com/v1/search/news.json'
+    Client_id='OOV7YVVmG9BCeCkEaEc9'
+    Client_Secrit='nV28yrBbdd'
+    headers={
+        'X-Naver-Client-Id': Client_id,
+        "X-Naver-Client-Secret": Client_Secrit,
+    }
+    query='경제'
+    params={
+        'query': query,
+        'display': '10',
+        'start': '1',
+        'sort': 'sim'
+    }
+
+    try:
+        response = requests.get(URL, headers=headers, params=params)
+        response.raise_for_status()  # HTTP 오류 발생시 예외 처리
+        data = response.json()
+        return JsonResponse(data, safe=False)  # safe=False 추가
+    except requests.exceptions.HTTPError as http_err:
+        return JsonResponse({'error': f'HTTP error occurred: {http_err}'}, status=500)
+    except Exception as err:
+        return JsonResponse({'error': f'Other error occurred: {err}'}, status=500)

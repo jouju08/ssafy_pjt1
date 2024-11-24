@@ -12,6 +12,5 @@ urlpatterns = [
     path('change/<str:cur_unit>/', views.get_change),
     path('getBankName/', views.get_bankname),
     path('<str:fin_prdt_cd>/top_rate_month/', views.top_rate_month),
-   
-   
+    path('news/', views.get_news),
 ]

@@ -8,6 +8,7 @@ import CreateView from '@/views/CreateView.vue'
 import BankSearch from '@/views/BankSearch.vue'
 import RegisterPage from '@/views/RegisterPage.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import EditProfile from '@/views/EditProfile.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,6 +61,11 @@ const router = createRouter({
       path: '/profile',
       name: 'ProfileView',
       component: ProfileView
+    },
+    {
+      path: '/profile/edit',
+      name: 'EditProfile',
+      component: EditProfile
     },
   ],
 })

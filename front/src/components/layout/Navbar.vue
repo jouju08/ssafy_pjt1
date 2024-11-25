@@ -36,6 +36,14 @@ const handleRegister = () => {
   showLoginModal.value = false;
   router.push('/register');
 };
+
+const handleProfileClick = () => {
+  if (props.isLoggedIn) {
+    router.push('/profile');
+  } else {
+    showLoginModal.value = true;
+  }
+};
 </script>
 
 <template>
@@ -51,7 +59,7 @@ const handleRegister = () => {
         <button v-else @click="showLoginModal = true" class="text-white hover:text-[#FFC700] transition-colors duration-200">
           Login
         </button>
-        <button @click="router.push('/profile')" class="text-white hover:text-[#FFC700] transition-colors duration-200">
+        <button @click="handleProfileClick" class="text-white hover:text-[#FFC700] transition-colors duration-200">
           My Profile
         </button>
         <button @click="toggleMenu" class="text-white hover:text-[#FFC700] transition-colors duration-200 px-4 py-2 rounded">

@@ -11,27 +11,38 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-# import environ
-# import os
+import os
+import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+MEDIA_URL = '/media/'  # 클라이언트가 파일에 접근할 때 사용하는 URL
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c1s=k=s1j2k)_r&hh1p(x%9v-d@vyk9p_xuw5_1m)ntha4$n@b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-# env = environ.Env(DEBUG=(bool, False))
-# environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 # API_KEY=env('API_KEY')
+CHATBOT_API_KEY=env('chatbot_api_key')
+FINLIFE_API_KEY=env('finlife_api_key')
+EXCHANGE_API_KEY=env('exchange_api_key')
+NAVER_CLIENT_ID=env('naver_client_id')
+NAVER_CLIENT_SECRET=env('naver_client_secret')
+
+
+
 # DEBUG = env.bool('DEBUG', default=False)
 # Application definition
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-c1s=k=s1j2k)_r&hh1p(x%9v-d@vyk9p_xuw5_1m)ntha4$n@b'
+
 INSTALLED_APPS = [
     'chatbot',
     'finlife',
@@ -108,8 +119,8 @@ ROOT_URLCONF = 'back.urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jwtredisprac',
-        'USER': 'prac',
+        'NAME': 'mysql_db',
+        'USER': 'root',
         'PASSWORD': '0000',
         'HOST': 'localhost',   # MySQL 호스트
         'PORT': '3306',        # MySQL 포트 (기본값은 3306)

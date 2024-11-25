@@ -1,14 +1,11 @@
-<!-- src/components/news/NewsCard.vue -->
 <template>
   <div class="flex gap-4 p-4 border-b hover:bg-gray-50 transition-colors">
-    <img 
-      :src="news.imageUrl" 
-      :alt="news.title"
-      class="w-24 h-24 object-cover rounded"
-    >
-    <div>
-      <h3 class="font-bold mb-2">{{ news.title }}</h3>
-      <p class="text-sm text-gray-600">{{ news.description }}</p>
+    <div class="w-full">
+      <a :href="news.link" target="_blank" class="hover:text-blue-600">
+        <h3 class="font-bold mb-2" v-html="news.title"></h3>
+      </a>
+      <p class="text-sm text-gray-600" v-html="news.description"></p>
+      <p class="text-xs text-gray-400 mt-2">{{ formatDate(news.pubDate) }}</p>
     </div>
   </div>
 </template>
@@ -20,4 +17,15 @@ defineProps({
     required: true
   }
 })
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
 </script>

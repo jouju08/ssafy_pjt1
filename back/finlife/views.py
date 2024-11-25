@@ -7,9 +7,9 @@ from .models import DepositProducts, DepositOptions,Change
 from .serializer import DepositOptionsSerializer, DepositProductsSerializer,ChangeSerializer
 from django.http import JsonResponse
 from django.conf import settings
-API_KEY='8606577955382312a042df530b801d13'
+API_KEY=settings.FINLIFE_API_KEY
 BASE_URL='http://finlife.fss.or.kr/finlifeapi/'
-from datetime import datetime
+from datetime import datetime, timedelta
 # Create your views here.
 
 @api_view(['GET']) #정기예금 상품 목록과 옵션 목록 DB에 저장
@@ -128,15 +128,15 @@ def top_rate(request):
 
 @api_view(['GET'])
 def save_change(request):
-    today=datetime.now()
-    if today.weekday()>=5:
+    today = datetime.now()
+    if today.weekday() >= 5:
         diff = today.weekday()-4
-        today = today - datetime.timedelta(days=diff)#주말엔 정보가 없으니 금요일로 바꿔주기
+        today = today - timedelta(days=diff)
     today=today.strftime('%Y%m%d')
-    API_KEYY='CVkBJTzbrnQkcYoUhhxeKEJughCIro3U'
+    API_KEYY=settings.EXCHANGE_API_KEY
     URL2='https://www.koreaexim.go.kr/site/program/financial/exchangeJSON?authkey={}&searchdate={}&data=AP01'
     url=URL2.format(API_KEYY, today)
-    response=requests.get(url,verify=False).json()#오류나면 verify 값 바꿔주기
+    response=requests.get(url,verify=True).json()#오류나면 verify 값 바꿔주기
     print(response)
     for li in response:
         cur_unit=li.get('cur_unit')
@@ -158,12 +158,28 @@ def save_change(request):
     return Response(serializer.data)
   
 @api_view(['GET'])
-def get_change(request,cur_unit):
-
-    changes=get_list_or_404(Change, cur_unit=cur_unit)
-    serializer=ChangeSerializer(changes, many=True)
-    return Response(serializer.data)
+def get_change(request, cur_unit):
+    changes = get_list_or_404(Change, cur_unit=cur_unit)
+    serializer = ChangeSerializer(changes, many=True)
     
+    for change in serializer.data:
+        # 쉼표 제거 후 float로 변환
+        change['ttb'] = float(change['ttb'].replace(',', ''))
+        change['tts'] = float(change['tts'].replace(',', ''))
+        change['deal_bas_r'] = float(change['deal_bas_r'].replace(',', ''))
+    
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_changes(request):
+    changes = Change.objects.all()
+    serializer = ChangeSerializer(changes, many=True)
+    for change in serializer.data:
+        change['ttb'] = float(change['ttb'].replace(',', '')) if change['ttb'] else 0
+        change['tts'] = float(change['tts'].replace(',', '')) if change['tts'] else 0
+        change['deal_bas_r'] = float(change['deal_bas_r'].replace(',', '')) if change['deal_bas_r'] else 0
+    return Response(serializer.data)
+
 @api_view(['GET'])
 def get_bankname(request):
     products = DepositProducts.objects.values('kor_co_nm').distinct().order_by('kor_co_nm')
@@ -199,8 +215,8 @@ def top_rate_month(request,fin_prdt_cd):
 @api_view(['GET'])
 def get_news(request):
     URL='https://openapi.naver.com/v1/search/news.json'
-    Client_id='OOV7YVVmG9BCeCkEaEc9'
-    Client_Secrit='nV28yrBbdd'
+    Client_id=settings.NAVER_CLIENT_ID
+    Client_Secrit=settings.NAVER_CLIENT_SECRET
     headers={
         'X-Naver-Client-Id': Client_id,
         "X-Naver-Client-Secret": Client_Secrit,

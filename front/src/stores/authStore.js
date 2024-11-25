@@ -1,12 +1,13 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
-
+import { useRouter } from 'vue-router';
 export const useAuthStore = defineStore('user', () => {
   const API_URL = 'http://localhost:8000';
   const token = ref(null);
   const isAuthenticated = ref(false);
   const usernameValue = ref(null);
+  const router = useRouter();
 
   // 쿠키에 토큰을 저장하는 함수
   const setToken = (tokenValue) => {
@@ -44,8 +45,7 @@ export const useAuthStore = defineStore('user', () => {
       usernameValue.value = username;
       localStorage.setItem('username', username);
       setToken(key);
-      alert('로그인에 성공했습니다!');
-      console.log('로그인 완료:', res.data);
+      window.location.reload();
     } catch (err) {
       alert('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
       console.error('로그인 실패:', err);
@@ -121,9 +121,60 @@ export const useAuthStore = defineStore('user', () => {
     }
   };
 
+  const getUserProfile = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/accounts/user/`, {
+        headers: {
+          Authorization: `Token ${token.value}`,
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error('프로필 가져오기 실패:', error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  const formatPhoneNumber = (phone) => {
+    // 하이픈 제거
+    const cleaned = phone.replace(/-/g, '');
+  
+    // 앞자리가 '0'으로 시작하면 '+82'로 교체
+    if (cleaned.startsWith('0')) {
+      return '+82' + cleaned.slice(1);
+    }
+    return cleaned;
+  };
+  
+  const updateUser = async (formData) => {
+    try {
+      // 전화번호 변환 처리
+      const phone = formData.get('phone'); // formData에서 phone 값을 가져옴
+      if (phone) {
+        const formattedPhone = formatPhoneNumber(phone);
+        formData.set('phone', formattedPhone); // 변환된 전화번호를 다시 formData에 설정
+      }
+  
+      const response = await axios.patch(`${API_URL}/account/edit/`, formData, {
+        headers: {
+          Authorization: `Token ${token.value}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      console.log('프로필 업데이트 성공:', response.data);
+      router.push('/profile');
+      return response.data;
+    } catch (error) {
+      console.error('프로필 업데이트 실패:', error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+
   // 페이지 로드 시 쿠키에서 토큰 읽기
   getTokenFromCookie();
   getUsernameFromLocalStorage();
 
-  return { API_URL, logIn, register, logOut, token, isAuthenticated, getTokenFromCookie, setToken, usernameValue, getUsernameFromLocalStorage };
+  return { API_URL, logIn, register, logOut, token, isAuthenticated, getTokenFromCookie, setToken, usernameValue, getUsernameFromLocalStorage, updateUser, getUserProfile };
 }, { persist: true });

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useAuthStore } from './authStore'
 
 export const useFinanceStore = defineStore('finance', {
   state: () => ({
@@ -8,7 +9,8 @@ export const useFinanceStore = defineStore('finance', {
     selectedProduct: null,
     productOptions: [],
     loading: false,
-    error: null
+    error: null,
+    userSubscribedProducts: []
   }),
 
   getters: {
@@ -22,6 +24,30 @@ export const useFinanceStore = defineStore('finance', {
         fin_prdt_nm: product.productName,
         kor_co_nm: product.bankName
       }))
+    },
+
+    // 새로운 getter 추가: 구독하지 않은 상품만 필터링
+    availableNewProducts: (state) => {
+      return state.products.filter(product => 
+        !state.userSubscribedProducts.some(
+          subProduct => subProduct.fin_prdt_cd === product.id
+        )
+      )
+    },
+
+    // 검색과 필터링을 위한 새로운 getter
+    filteredAvailableProducts: (state) => (searchQuery, bankCode) => {
+      return state.products
+        .filter(product => 
+          // 이미 구독한 상품 제외
+          !state.userSubscribedProducts.some(
+            subProduct => subProduct.fin_prdt_cd === product.id
+          ) &&
+          // 검색어 필터링
+          product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          // 은행 필터링
+          (!bankCode || product.bankName === bankCode)
+        )
     }
   },
 
@@ -52,6 +78,21 @@ export const useFinanceStore = defineStore('finance', {
       } catch (error) {
         this.error = '은행 목록을 불러오는데 실패했습니다.'
         console.error('Error fetching banks:', error)
+      }
+    },
+
+    async fetchUserSubscribedProducts() {
+      const authStore = useAuthStore();
+      try {
+        const response = await axios.get('http://localhost:8000/account/profile/', {
+          headers: {
+            Authorization: `Token ${authStore.token}`,
+          },
+        });
+        this.userSubscribedProducts = response.data.subscribed_products || [];
+      } catch (error) {
+        console.error('Error fetching user products:', error);
+        this.userSubscribedProducts = [];
       }
     },
 
@@ -127,6 +168,47 @@ export const useFinanceStore = defineStore('finance', {
         (!bankCode || product.bankName === bankCode) &&
         (!period || product.period === parseInt(period))
       )
+    },
+
+    async addProductToAccount(productId) {
+      const authStore = useAuthStore();
+      try {
+        const response = await axios.post(
+          `http://localhost:8000/account/add-product/`,
+          { product_id: productId },
+          {
+            headers: {
+              Authorization: `Token ${authStore.token}`, // 인증 토큰 포함
+            },
+          }
+        );
+        console.log('상품 추가 성공:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error adding product to account:', error.response?.data || error.message);
+        throw error; // 호출한 쪽에서 처리할 수 있도록 예외를 다시 던짐
+      }
+    },
+
+    async removeProductFromAccount(productId) {
+      const authStore = useAuthStore();
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/account/remove-product/`,
+          {
+            headers: {
+              Authorization: `Token ${authStore.token}`,
+            },
+            data: { product_id: productId }
+          }
+        );
+        console.log('상품 해지 성공:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error removing product from account:', error.response?.data || error.message);
+        throw error;
+      }
     }
+    
   }
 })

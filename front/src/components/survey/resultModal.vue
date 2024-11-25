@@ -7,7 +7,7 @@
         {{ styleDescription }}
       </p>
       <button 
-        @click="closeModal" 
+        @click="$emit('close')" 
         class="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         닫기

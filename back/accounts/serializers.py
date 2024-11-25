@@ -88,10 +88,22 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
             'is_staff',
             'last_login'
         ]
-        read_only_fields = ('email',)
+
+
+class SubscribedProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    fin_prdt_nm = serializers.CharField()
+    fin_prdt_cd = serializers.CharField()
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    subscribed_products = serializers.SerializerMethodField()
+
     class Meta:
         model = UserModel
         fields = '__all__'
         read_only_fields = ('username', 'email')
+
+    def get_subscribed_products(self, obj):
+        products = obj.subscribed_products.all()
+        serializer = SubscribedProductSerializer(products, many=True)
+        return serializer.data

@@ -327,9 +327,9 @@ onMounted(async () => {
           </select>
         </div>
 
-        <!-- 가입할 상품 선택 -->
+        <!-- 가입한 상품 선택 -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">가입할 상품 선택</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">가입한 상품 선택</label>
           <div class="space-y-2 max-h-60 overflow-y-auto">
             <div v-for="product in financeStore.availableProducts" :key="product.id" 
                 class="flex items-center justify-between p-2 border rounded hover:bg-gray-50"

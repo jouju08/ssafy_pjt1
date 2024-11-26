@@ -29,12 +29,16 @@ ALLOWED_HOSTS = ['*']
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 # API_KEY=env('API_KEY')
-CHATBOT_API_KEY=env('chatbot_api_key')
-FINLIFE_API_KEY=env('finlife_api_key')
-EXCHANGE_API_KEY=env('exchange_api_key')
-NAVER_CLIENT_ID=env('naver_client_id')
-NAVER_CLIENT_SECRET=env('naver_client_secret')
-
+# CHATBOT_API_KEY=env('chatbot_api_key')
+# FINLIFE_API_KEY=env('finlife_api_key')
+# EXCHANGE_API_KEY=env('exchange_api_key')
+# NAVER_CLIENT_ID=env('naver_client_id')
+# NAVER_CLIENT_SECRET=env('naver_client_secret')
+CHATBOT_API_KEY = os.getenv('CHATBOT_API_KEY')
+FINLIFE_API_KEY = os.getenv('FINLIFE_API_KEY')
+EXCHANGE_API_KEY = os.getenv('EXCHANGE_API_KEY')
+NAVER_CLIENT_ID = os.getenv('NAVER_CLIENT_ID')
+NAVER_CLIENT_SECRET = os.getenv('NAVER_CLIENT_SECRET')
 
 
 # DEBUG = env.bool('DEBUG', default=False)
